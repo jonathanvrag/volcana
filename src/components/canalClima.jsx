@@ -1,5 +1,4 @@
 import Map from './map.jsx';
-import Carrousel from './carrousel.jsx';
 
 export default function CanalClima() {
   return (

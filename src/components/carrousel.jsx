@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 export default function Carrousel() {
-  const items = ['1', '2', '3', '4', '5', '6'];
+  const items = ['☀️', '🌦️', '⛈️', '🌧️', '🌤️', '☁️'];
   const itemsPerBlock = 3;
   const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
 
@@ -13,8 +13,8 @@ export default function Carrousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBlockIndex(prevIndex => (prevIndex + 1) % blocks.length);
-      // }, 20000); // 20 segundos
-    }, 2000); // 20 segundos
+    }, 20000); // 20 segundos
+    // }, 2000); // 20 segundos
 
     return () => clearInterval(interval);
   }, [blocks.length]);
