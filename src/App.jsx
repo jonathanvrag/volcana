@@ -1,14 +1,12 @@
-import StaticUnits from './components/staticUnits.jsx';
-import DynamicUnits from './components/dynamicUnit.jsx';
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
+import Dashboard from './components/Dashboard';
 
 function App() {
   return (
     <div>
       <Routes>
-        <Route path='/' element={<StaticUnits />} />
-        <Route path='/dinamicas' element={<DynamicUnits />} />
+        <Route path='/' element={<Dashboard />} />
       </Routes>
     </div>
   );

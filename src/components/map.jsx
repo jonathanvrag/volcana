@@ -1,12 +1,12 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import Carrousel from './carrousel.jsx';
+import Carrousel from './Carrousel';
 
 export default function Map() {
   const position = [6.199, -75.579];
 
   return (
-    <div className='relative h-full w-full'>
+    <div className='relative h-full w-full rounded-xl overflow-hidden'>
       <MapContainer
         center={position}
         zoom={15}
@@ -26,7 +26,7 @@ export default function Map() {
           <Popup>EAFIT</Popup>
         </Marker>
       </MapContainer>
-      <div className='absolute bottom-0 left-0 right-0 z-10'>
+      <div className='absolute bottom-4 left-0 right-0 z-10'>
         <Carrousel />
       </div>
     </div>
