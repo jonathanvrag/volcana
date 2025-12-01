@@ -17,7 +17,6 @@ services:
   backend:
     build:
       context: ../backend
-      dockerfile: Dockerfile
     container_name: volcana-backend
     environment:
       DATABASE_URL: postgresql://volcana:volcana@db:5432/volcana
@@ -28,28 +27,27 @@ services:
     ports:
       - '8000:8000'
 
-  # frontend:
-  #   build:
-  #     context: ../frontend
-  #     dockerfile: Dockerfile
-  #   container_name: volcana-frontend
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - volcana-net
+  frontend:
+    build:
+      context: ../frontend
+    container_name: volcana-frontend
+    depends_on:
+      - backend
+    networks:
+      - volcana-net
 
-  # nginx:
-  #   image: nginx:alpine
-  #   container_name: volcana-core-nginx
-  #   depends_on:
-  #     # - frontend
-  #     - backend
-  #   volumes:
-  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
-  #   ports:
-  #     - "80:80"
-  #   networks:
-  #     - volcana-net
+  nginx:
+    image: nginx:alpine
+    container_name: volcana-core-nginx
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - '8080:80'
+    networks:
+      - volcana-net
 
 volumes:
   db_data:

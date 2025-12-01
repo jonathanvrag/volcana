@@ -1,4 +1,4 @@
-import Map from './map.jsx';
+import Map from './Map';
 
 export default function CanalClima() {
   return (
