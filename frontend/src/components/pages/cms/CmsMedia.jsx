@@ -135,7 +135,7 @@ export default function CmsMedia() {
           <div className='flex flex-col gap-1'>
             <label className='text-xs font-medium text-slate-600'>Título</label>
             <input
-              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white'
+              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white text-slate-950'
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder='Nombre interno'
@@ -149,7 +149,7 @@ export default function CmsMedia() {
               URL / ruta archivo *
             </label>
             <input
-              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white'
+              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white text-slate-950'
               value={fileUrl}
               onChange={e => setFileUrl(e.target.value)}
               placeholder='/media/imagenes/volcana-01.png'
@@ -162,7 +162,7 @@ export default function CmsMedia() {
             </label>
             <input
               type='number'
-              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white'
+              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white text-slate-950'
               value={orderIndex}
               onChange={e => setOrderIndex(e.target.value)}
             />
@@ -174,7 +174,7 @@ export default function CmsMedia() {
             </label>
             <input
               type='number'
-              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white'
+              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white text-slate-950'
               value={duration}
               onChange={e => setDuration(e.target.value)}
             />

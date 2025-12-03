@@ -90,7 +90,7 @@ export default function CmsPlaylists() {
               Nombre *
             </label>
             <input
-              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white'
+              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white text-slate-950'
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder='Pantalla LED principal'
@@ -101,7 +101,7 @@ export default function CmsPlaylists() {
               Descripción
             </label>
             <input
-              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white'
+              className='border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 bg-white text-slate-950'
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder='Loop principal en la pantalla del Bloque 19'
