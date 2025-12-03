@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import CanalClima from './CanalClima';
-import PanelMonitor from './PanelMonitor';
-import SciurusGranatensis from '../assets/SciurusGranatensis.png';
-import ReinitaCastaña from '../assets/ReinitaCastaña.png';
-import PristimantisAchatinus from '../assets/PristimantisAchatinus.png';
-import AtractusSp from '../assets/AtractusSp.png';
+import CanalClima from '../CanalClima';
+import PanelMonitor from '../PanelMonitor';
+import SciurusGranatensis from '../../assets/SciurusGranatensis.png';
+import ReinitaCastaña from '../../assets/ReinitaCastaña.png';
+import PristimantisAchatinus from '../../assets/PristimantisAchatinus.png';
+import AtractusSp from '../../assets/AtractusSp.png';
 
-export default function Dashboard() {
+export default function PantallaPublica() {
   const [showPanelMonitor, setShowPanelMonitor] = useState(true);
 
   useEffect(() => {

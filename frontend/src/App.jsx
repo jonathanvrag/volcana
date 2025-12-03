@@ -1,14 +1,24 @@
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import Dashboard from './components/Dashboard';
+import PantallaPublica from './components/pages/PantallaPublica';
+import CmsLayout from './components/pages/cms/CmsLayout';
+import CmsPlaylists from './components/pages/cms/CmsPlaylist';
+import CmsMedia from './components/pages/cms/CmsMedia';
 
 function App() {
   return (
-    <div>
-      <Routes>
-        <Route path='/' element={<Dashboard />} />
-      </Routes>
-    </div>
+    <Routes>
+      {/* Pantalla pública */}
+      <Route path='/' element={<PantallaPublica />} />
+
+      {/* CMS bajo /cms */}
+      <Route path='/cms' element={<CmsLayout />}>
+        {/* /cms */}
+        <Route index element={<CmsPlaylists />} />
+        {/* /cms/media */}
+        <Route path='media' element={<CmsMedia />} />
+      </Route>
+    </Routes>
   );
 }
 
