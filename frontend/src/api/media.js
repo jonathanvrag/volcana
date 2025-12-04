@@ -20,3 +20,27 @@ export async function updateMedia(id, data) {
 export async function deleteMedia(id) {
   return api.delete(`/media/${id}`);
 }
+
+export async function uploadMediaFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(
+    import.meta.env.VITE_API_BASE_URL
+      ? `${import.meta.env.VITE_API_BASE_URL}/upload`
+      : 'http://localhost:8000/api/upload',
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(
+      `Error subiendo archivo: ${text || res.statusText || res.status}`
+    );
+  }
+
+  return res.json();
+}

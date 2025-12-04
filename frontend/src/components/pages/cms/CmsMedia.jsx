@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import { fetchPlaylists } from '../../../api/playlists';
-import { fetchMedia, createMedia, deleteMedia } from '../../../api/media';
+import {
+  fetchMedia,
+  createMedia,
+  deleteMedia,
+  uploadMediaFile,
+} from '../../../api/media';
 
 export default function CmsMedia() {
   const [playlists, setPlaylists] = useState([]);
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const [playlistId, setPlaylistId] = useState('');
   const [type, setType] = useState('image');
@@ -79,6 +85,22 @@ export default function CmsMedia() {
     }
   }
 
+  async function handleFileSelect(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      setError('');
+      const data = await uploadMediaFile(file);
+      setFileUrl(data.file_url);
+    } catch (err) {
+      setError(err.message || 'Error subiendo archivo');
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <div className='space-y-6'>
       <div>
@@ -143,8 +165,26 @@ export default function CmsMedia() {
           </div>
         </div>
 
+        {/* BLOQUE MODIFICADO: archivo + URL */}
         <div className='grid gap-3 md:grid-cols-3'>
           <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-slate-600'>
+              Archivo (imagen o video)
+            </label>
+            <input
+              type='file'
+              accept='image/*,video/*'
+              onChange={handleFileSelect}
+              className='text-xs text-slate-700'
+            />
+            {uploading && (
+              <p className='text-[11px] text-slate-500 mt-1'>
+                Subiendo archivo...
+              </p>
+            )}
+          </div>
+
+          <div className='flex flex-col gap-1 md:col-span-2'>
             <label className='text-xs font-medium text-slate-600'>
               URL / ruta archivo *
             </label>
@@ -154,8 +194,13 @@ export default function CmsMedia() {
               onChange={e => setFileUrl(e.target.value)}
               placeholder='/media/imagenes/volcana-01.png'
             />
+            <p className='text-[11px] text-slate-500 mt-1'>
+              Puedes subir un archivo o pegar una URL pública.
+            </p>
           </div>
+        </div>
 
+        <div className='grid gap-3 md:grid-cols-3'>
           <div className='flex flex-col gap-1'>
             <label className='text-xs font-medium text-slate-600'>
               Orden en loop
