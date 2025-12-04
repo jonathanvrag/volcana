@@ -26,6 +26,8 @@ services:
       - volcana-net
     ports:
       - '8000:8000'
+    volumes:
+      - media_data:/app/media
 
   # frontend:
   #   build:
@@ -51,6 +53,7 @@ services:
 
 volumes:
   db_data:
+  media_data:
 
 networks:
   volcana-net:
