@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fetchPlaylists } from '../../../api/playlists';
 import {
   fetchMedia,
@@ -24,6 +24,8 @@ export default function CmsMedia() {
   const [orderIndex, setOrderIndex] = useState(0);
   const [duration, setDuration] = useState(20);
   const [creating, setCreating] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   async function loadData() {
     try {
@@ -70,6 +72,11 @@ export default function CmsMedia() {
       setFileUrl('');
       setOrderIndex(0);
       setDuration(20);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
       await loadData();
     } catch (err) {
       setError(err.message || 'Error creando media');
@@ -181,8 +188,6 @@ export default function CmsMedia() {
               onChange={e => setType(e.target.value)}>
               <option value='image'>Imagen</option>
               <option value='video'>Video</option>
-              <option value='text'>Texto</option>
-              <option value='clip'>Clip</option>
             </select>
           </div>
 
@@ -197,21 +202,37 @@ export default function CmsMedia() {
           </div>
         </div>
 
-        {/* BLOQUE MODIFICADO: archivo + URL */}
+        {/* archivo + URL */}
         <div className='grid gap-3 md:grid-cols-3'>
           <div className='flex flex-col gap-1'>
             <label className='text-xs font-medium text-slate-600'>
               Archivo (imagen o video)
             </label>
             <input
+              ref={fileInputRef}
               type='file'
               accept='image/*,video/*'
               onChange={handleFileSelect}
-              className='text-xs text-slate-700'
+              className='hidden'
             />
+            <button
+              type='button'
+              onClick={() =>
+                fileInputRef.current && fileInputRef.current.click()
+              }
+              className='inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded border border-slate-300 bg-white text-slate-800 hover:bg-slate-50'>
+              Seleccionar archivo
+            </button>
+
+            {/* Estado de subida / nombre */}
             {uploading && (
               <p className='text-[11px] text-slate-500 mt-1'>
                 Subiendo archivo...
+              </p>
+            )}
+            {!uploading && fileUrl.startsWith('/media/') && (
+              <p className='text-[11px] text-slate-500 mt-1 truncate'>
+                Archivo seleccionado: {fileUrl.replace('/media/', '')}
               </p>
             )}
           </div>
