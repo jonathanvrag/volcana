@@ -1,7 +1,10 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../../../auth/logout';
 
 export default function CmsLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = path =>
     location.pathname === path ? 'bg-slate-800 text-white' : 'text-slate-200';
@@ -17,23 +20,33 @@ export default function CmsLayout() {
           </p>
         </div>
 
-        <nav className='flex-1 px-3 py-4 space-y-1 text-sm'>
-          <Link
-            to='/cms'
-            className={
-              'block rounded px-3 py-2 hover:bg-slate-800 ' + isActive('/cms')
-            }>
-            Playlists
-          </Link>
-          <Link
-            to='/cms/media'
-            className={
-              'block rounded px-3 py-2 hover:bg-slate-800 ' +
-              isActive('/cms/media')
-            }>
-            Media
-          </Link>
-        </nav>
+        <div className='flex-1 flex flex-col'>
+          <nav className='px-3 py-4 space-y-1 text-sm'>
+            <Link
+              to='/cms'
+              className={
+                'block rounded px-3 py-2 hover:bg-slate-800 ' + isActive('/cms')
+              }>
+              Playlists
+            </Link>
+            <Link
+              to='/cms/media'
+              className={
+                'block rounded px-3 py-2 hover:bg-slate-800 ' +
+                isActive('/cms/media')
+              }>
+              Media
+            </Link>
+          </nav>
+
+          <div className='mt-auto px-4 pb-4'>
+            <button
+              onClick={() => logout(navigate)}
+              className='w-full rounded-md bg-slate-800 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700'>
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
       </aside>
 
       {/* Contenido principal */}
