@@ -1,8 +1,10 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from app.db.sessions import get_db
 from app.db import models
+from app.deps.auth import get_current_user, require_role
 from . import schemas
 
 router = APIRouter()
@@ -17,7 +19,10 @@ router = APIRouter()
     response_model=List[schemas.PlaylistOut],
     tags=["Playlists"],
 )
-def list_playlists(db: Session = Depends(get_db)):
+def list_playlists(
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
     return db.query(models.Playlist).all()
 
 
@@ -30,6 +35,7 @@ def list_playlists(db: Session = Depends(get_db)):
 def create_playlist(
     payload: schemas.PlaylistCreate,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     playlist = models.Playlist(**payload.dict())
     db.add(playlist)
@@ -43,7 +49,11 @@ def create_playlist(
     response_model=schemas.PlaylistOut,
     tags=["Playlists"],
 )
-def get_playlist(playlist_id: int, db: Session = Depends(get_db)):
+def get_playlist(
+    playlist_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
     playlist = (
         db.query(models.Playlist)
         .filter(models.Playlist.id == playlist_id)
@@ -63,6 +73,7 @@ def update_playlist(
     playlist_id: int,
     payload: schemas.PlaylistUpdate,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     playlist = (
         db.query(models.Playlist)
@@ -85,7 +96,11 @@ def update_playlist(
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["Playlists"],
 )
-def delete_playlist(playlist_id: int, db: Session = Depends(get_db)):
+def delete_playlist(
+    playlist_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(require_role("admin")),
+):
     playlist = (
         db.query(models.Playlist)
         .filter(models.Playlist.id == playlist_id)
@@ -108,7 +123,10 @@ def delete_playlist(playlist_id: int, db: Session = Depends(get_db)):
     response_model=List[schemas.MediaOut],
     tags=["Media"],
 )
-def list_media(db: Session = Depends(get_db)):
+def list_media(
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
     return db.query(models.MediaItem).all()
 
 
@@ -121,6 +139,7 @@ def list_media(db: Session = Depends(get_db)):
 def create_media(
     payload: schemas.MediaCreate,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     playlist = (
         db.query(models.Playlist)
@@ -142,7 +161,11 @@ def create_media(
     response_model=schemas.MediaOut,
     tags=["Media"],
 )
-def get_media(media_id: int, db: Session = Depends(get_db)):
+def get_media(
+    media_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
     media = (
         db.query(models.MediaItem)
         .filter(models.MediaItem.id == media_id)
@@ -162,6 +185,7 @@ def update_media(
     media_id: int,
     payload: schemas.MediaUpdate,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     media = (
         db.query(models.MediaItem)
@@ -184,7 +208,11 @@ def update_media(
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["Media"],
 )
-def delete_media(media_id: int, db: Session = Depends(get_db)):
+def delete_media(
+    media_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(require_role("admin")),
+):
     media = (
         db.query(models.MediaItem)
         .filter(models.MediaItem.id == media_id)
@@ -205,7 +233,10 @@ def delete_media(media_id: int, db: Session = Depends(get_db)):
     response_model=List[schemas.MediaOut],
     tags=["Media"],
 )
-def get_playlist_media(playlist_id: int, db: Session = Depends(get_db)):
+def get_playlist_media(
+    playlist_id: int,
+    db: Session = Depends(get_db),
+):
     items = (
         db.query(models.MediaItem)
         .filter(
