@@ -1,19 +1,11 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.db.sessions import SessionLocal
+from app.db.sessions import get_db
 from app.db import models
 from . import schemas
 
 router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 # =====================

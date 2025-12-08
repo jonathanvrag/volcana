@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, Text, Boolean, ForeignKey, DateTime, func
+from sqlalchemy import Column, Integer, Text, Boolean, ForeignKey, DateTime, func, String
 from sqlalchemy.orm import relationship
 from .sessions import Base
+
 
 class Playlist(Base):
     __tablename__ = "playlist"
@@ -11,6 +12,7 @@ class Playlist(Base):
     is_active = Column(Boolean, default=True)
 
     items = relationship("MediaItem", back_populates="playlist")
+
 
 class MediaItem(Base):
     __tablename__ = "media_item"
@@ -32,3 +34,14 @@ class MediaItem(Base):
     )
 
     playlist = relationship("Playlist", back_populates="items")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    full_name = Column(String(255), nullable=True)
+    password_hash = Column(String(255), nullable=False)
+    role = Column(String(50), nullable=False, default="editor")
+    is_active = Column(Boolean, default=True)
