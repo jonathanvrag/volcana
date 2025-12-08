@@ -4,19 +4,24 @@ import PantallaPublica from './components/pages/PantallaPublica';
 import CmsLayout from './components/pages/cms/CmsLayout';
 import CmsPlaylists from './components/pages/cms/CmsPlaylist';
 import CmsMedia from './components/pages/cms/CmsMedia';
+import LoginPage from './components/pages/LoginPage';
+import PrivateRoute from './router/PrivateRoute';
 
 function App() {
   return (
     <Routes>
       {/* Pantalla pública */}
-      <Route path='/' element={<PantallaPublica />} />
+      <Route path="/" element={<PantallaPublica />} />
 
-      {/* CMS bajo /cms */}
-      <Route path='/cms' element={<CmsLayout />}>
-        {/* /cms */}
-        <Route index element={<CmsPlaylists />} />
-        {/* /cms/media */}
-        <Route path='media' element={<CmsMedia />} />
+      {/* Login */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* CMS protegido bajo /cms */}
+      <Route element={<PrivateRoute />}>
+        <Route path="/cms" element={<CmsLayout />}>
+          <Route index element={<CmsPlaylists />} />
+          <Route path="media" element={<CmsMedia />} />
+        </Route>
       </Route>
     </Routes>
   );
