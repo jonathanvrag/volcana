@@ -24,7 +24,9 @@ export default function CmsMedia() {
   const [orderIndex, setOrderIndex] = useState(0);
   const [duration, setDuration] = useState(20);
   const [creating, setCreating] = useState(false);
+  const [previewItem, setPreviewItem] = useState(null);
 
+  const API_ORIGIN = import.meta.VITE_API_BASE_URL || 'http://localhost:8000';
   const fileInputRef = useRef(null);
 
   async function loadData() {
@@ -138,6 +140,11 @@ export default function CmsMedia() {
     } finally {
       setSavingId(null);
     }
+  }
+
+  function getMediaSrc(fileUrl) {
+    if (!fileUrl) return '';
+    return fileUrl.startsWith('http') ? fileUrl : `${API_ORIGIN}${fileUrl}`;
   }
 
   return (
@@ -423,6 +430,12 @@ export default function CmsMedia() {
 
                   {/* Acciones */}
                   <td className='px-3 py-2 text-right space-x-2'>
+                    <button
+                      onClick={() => setPreviewItem(m)}
+                      className='text-xs text-sky-700 hover:text-sky-900'>
+                      Ver
+                    </button>
+
                     {editingId === m.id ? (
                       <>
                         <button
@@ -458,6 +471,46 @@ export default function CmsMedia() {
           </tbody>
         </table>
       </div>
+
+      {previewItem && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60'>
+          <div className='bg-white rounded-lg shadow-lg max-w-5xl w-full mx-4 overflow-hidden'>
+            <div className='flex items-center justify-between px-4 py-2 border-b border-slate-200 bg-slate-50'>
+              <div>
+                <h4 className='text-sm font-semibold text-slate-800'>
+                  Previsualización
+                </h4>
+                <p className='text-xs text-slate-500'>
+                  {previewItem.title || previewItem.file_url}
+                </p>
+              </div>
+              <button
+                onClick={() => setPreviewItem(null)}
+                className='text-xs text-slate-500 hover:text-slate-800'>
+                Cerrar
+              </button>
+            </div>
+
+            <div className='bg-black flex items-center justify-center max-h-[80vh]'>
+              {previewItem.type === 'video' ? (
+                <video
+                  src={getMediaSrc(previewItem.file_url)}
+                  controls
+                  autoPlay
+                  muted
+                  className='max-h-[80vh] max-w-full object-contain'
+                />
+              ) : (
+                <img
+                  src={getMediaSrc(previewItem.file_url)}
+                  alt={previewItem.title || ''}
+                  className='max-h-[80vh] max-w-full object-contain'
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
