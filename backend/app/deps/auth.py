@@ -1,12 +1,13 @@
+from typing import Annotated
+
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from typing import Annotated
-import jwt
 
 from app.db.sessions import get_db
 from app.db import models
-from app.security import SECRET_KEY, ALGORITHM, decode_access_token
+from app.security import decode_access_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
