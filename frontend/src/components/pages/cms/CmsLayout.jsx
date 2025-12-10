@@ -55,6 +55,16 @@ export default function CmsLayout() {
               }>
               Mi cuenta
             </Link>
+            {currentUser?.role === 'admin' && (
+              <Link
+                to='/cms/users'
+                className={
+                  'block rounded px-3 py-2 hover:bg-slate-800 ' +
+                  isActive('/cms/users')
+                }>
+                Usuarios
+              </Link>
+            )}
           </nav>
 
           <div className='mt-auto px-4 pb-4'>

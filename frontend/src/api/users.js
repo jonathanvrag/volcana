@@ -7,3 +7,7 @@ export async function getCurrentUser() {
 export async function changePassword(payload) {
   return api.post('/users/change-password', payload);
 }
+
+export async function createUser(payload) {
+  return api.post('/users', payload);
+}
