@@ -5,14 +5,15 @@ from sqlalchemy.orm import Session
 from app.db.sessions import get_db
 from app.db import models
 from app.deps.auth import get_current_user, require_role
+from app.services.audit import log_action
 from . import schemas
 
 router = APIRouter()
 
-
 # =====================
 # Playlists
 # =====================
+
 
 @router.get(
     "/playlists",
@@ -39,6 +40,17 @@ def create_playlist(
 ):
     playlist = models.Playlist(**payload.dict())
     db.add(playlist)
+
+    log_action(
+        db,
+        user_id=user.id,
+        action="playlist_created",
+        entity_type="playlist",
+        entity_id=playlist.id,
+        description=f"Playlist creada: {playlist.name}",
+        details={"description": playlist.description},
+    )
+
     db.commit()
     db.refresh(playlist)
     return playlist
@@ -83,8 +95,30 @@ def update_playlist(
     if not playlist:
         raise HTTPException(status_code=404, detail="Playlist not found")
 
+    before = {
+        "name": playlist.name,
+        "description": playlist.description,
+    }
+
     for field, value in payload.dict(exclude_unset=True).items():
         setattr(playlist, field, value)
+
+    db.add(playlist)
+
+    after = {
+        "name": playlist.name,
+        "description": playlist.description,
+    }
+
+    log_action(
+        db,
+        user_id=user.id,
+        action="playlist_updated",
+        entity_type="playlist",
+        entity_id=playlist.id,
+        description=f"Playlist actualizada: {playlist.name}",
+        details={"before": before, "after": after},
+    )
 
     db.commit()
     db.refresh(playlist)
@@ -110,6 +144,16 @@ def delete_playlist(
         raise HTTPException(status_code=404, detail="Playlist not found")
 
     db.delete(playlist)
+
+    log_action(
+        db,
+        user_id=user.id,
+        action="playlist_deleted",
+        entity_type="playlist",
+        entity_id=playlist.id,
+        description=f"Playlist eliminada: {playlist.name}",
+    )
+
     db.commit()
     return None
 
@@ -151,6 +195,21 @@ def create_media(
 
     media = models.MediaItem(**payload.dict())
     db.add(media)
+
+    log_action(
+        db,
+        user_id=user.id,
+        action="media_created",
+        entity_type="media",
+        entity_id=media.id,
+        description=f"Media creada en playlist {playlist.name}",
+        details={
+            "playlist_id": media.playlist_id,
+            "type": media.type,
+            "title": getattr(media, "title", None),
+        },
+    )
+
     db.commit()
     db.refresh(media)
     return media
@@ -195,8 +254,36 @@ def update_media(
     if not media:
         raise HTTPException(status_code=404, detail="Media item not found")
 
+    before = {
+        "playlist_id": media.playlist_id,
+        "type": media.type,
+        "title": getattr(media, "title", None),
+        "active": getattr(media, "active", None),
+        "order_index": getattr(media, "order_index", None),
+    }
+
     for field, value in payload.dict(exclude_unset=True).items():
         setattr(media, field, value)
+
+    db.add(media)
+
+    after = {
+        "playlist_id": media.playlist_id,
+        "type": media.type,
+        "title": getattr(media, "title", None),
+        "active": getattr(media, "active", None),
+        "order_index": getattr(media, "order_index", None),
+    }
+
+    log_action(
+        db,
+        user_id=user.id,
+        action="media_updated",
+        entity_type="media",
+        entity_id=media.id,
+        description=f"Media actualizada (id {media.id})",
+        details={"before": before, "after": after},
+    )
 
     db.commit()
     db.refresh(media)
@@ -222,6 +309,16 @@ def delete_media(
         raise HTTPException(status_code=404, detail="Media item not found")
 
     db.delete(media)
+
+    log_action(
+        db,
+        user_id=user.id,
+        action="media_deleted",
+        entity_type="media",
+        entity_id=media.id,
+        description=f"Media eliminada (id {media.id})",
+    )
+
     db.commit()
     return None
 

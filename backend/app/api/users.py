@@ -7,6 +7,7 @@ from app.db.sessions import get_db
 from app.db import models
 from app.deps.auth import get_current_user, require_role
 from app.security import get_password_hash, verify_password
+from app.services.audit import log_action
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -81,6 +82,18 @@ def create_user(
         is_active=payload.is_active,
     )
     db.add(user)
+
+    # Log: usuario creado
+    log_action(
+        db,
+        user_id=admin.id,
+        action="user_created",
+        entity_type="user",
+        entity_id=user.id,
+        description=f"Usuario creado: {user.email}",
+        details={"role": user.role, "is_active": user.is_active},
+    )
+
     db.commit()
     db.refresh(user)
     return user
@@ -100,6 +113,17 @@ def change_password(
 
     current_user.password_hash = get_password_hash(payload.new_password)
     db.add(current_user)
+
+    # Log: cambio de contraseña propio
+    log_action(
+        db,
+        user_id=current_user.id,
+        action="password_changed",
+        entity_type="user",
+        entity_id=current_user.id,
+        description="Cambio de contraseña del usuario",
+    )
+
     db.commit()
     return
 
@@ -127,11 +151,27 @@ def update_user(
             detail="No se puede desactivar el usuario administrador principal",
         )
 
+    before = {"role": user.role, "is_active": user.is_active}
+
     data = payload.model_dump(exclude_unset=True)
     for field, value in data.items():
         setattr(user, field, value)
 
     db.add(user)
+
+    after = {"role": user.role, "is_active": user.is_active}
+
+    # Log: actualización de usuario (rol / activo)
+    log_action(
+        db,
+        user_id=admin.id,
+        action="user_updated",
+        entity_type="user",
+        entity_id=user.id,
+        description=f"Usuario actualizado: {user.email}",
+        details={"before": before, "after": after},
+    )
+
     db.commit()
     db.refresh(user)
     return user
