@@ -1,13 +1,23 @@
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../../auth/logout';
+import { getCurrentUser } from '../../../api/users';
 
 export default function CmsLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [currentUser, setCurrentUser] = useState(null);
+
   const isActive = path =>
     location.pathname === path ? 'bg-slate-800 text-white' : 'text-slate-200';
+
+  useEffect(() => {
+    getCurrentUser()
+      .then(setCurrentUser)
+      .catch(() => setCurrentUser(null));
+  }, []);
 
   return (
     <div className='min-h-screen bg-slate-100 flex'>
@@ -51,10 +61,21 @@ export default function CmsLayout() {
 
       {/* Contenido principal */}
       <main className='flex-1 flex flex-col'>
-        <header className='h-14 bg-white border-b border-slate-200 flex items-center px-6'>
+        <header className='h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6'>
           <h2 className='text-base font-semibold text-slate-800'>
             Panel de administración
           </h2>
+
+          {currentUser && (
+            <div className='text-xs text-slate-500 text-right'>
+              <div className='font-medium text-slate-700'>
+                {currentUser.full_name || currentUser.email}
+              </div>
+              <div className='uppercase tracking-wide text-[10px]'>
+                {currentUser.role}
+              </div>
+            </div>
+          )}
         </header>
 
         <section className='flex-1 p-6'>
