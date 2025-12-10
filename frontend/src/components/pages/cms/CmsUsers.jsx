@@ -252,7 +252,13 @@ export default function CmsUsers() {
                     {u.is_active ? (
                       <button
                         onClick={() => toggleActive(u)}
-                        className='inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-100 hover:border-red-300 cursor-pointer'>
+                        disabled={u.email === 'admin_volcana@eafit.edu.co'}
+                        className={
+                          'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ' +
+                          (u.email === 'admin_volcana@eafit.edu.co'
+                            ? 'border border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+                            : 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:border-red-300 cursor-pointer')
+                        }>
                         Desactivar
                       </button>
                     ) : (

@@ -118,6 +118,15 @@ def update_user(
             detail="Usuario no encontrado",
         )
 
+    if (
+        user.email == "admin_volcana@eafit.edu.co"
+        and payload.is_active is False
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se puede desactivar el usuario administrador principal",
+        )
+
     data = payload.model_dump(exclude_unset=True)
     for field, value in data.items():
         setattr(user, field, value)
