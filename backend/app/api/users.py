@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr, constr
+from typing import List
 
 from app.db.sessions import get_db
 from app.db import models
@@ -35,11 +36,24 @@ class ChangePasswordIn(BaseModel):
     new_password: constr(min_length=6)
 
 
+class UserUpdate(BaseModel):
+    role: str | None = None
+    is_active: bool | None = None
+
+
 @router.get("/me", response_model=UserOut)
 def read_current_user(
     current_user: models.User = Depends(get_current_user),
 ):
     return current_user
+
+
+@router.get("/", response_model=List[UserOut])
+def list_users(
+    db: Session = Depends(get_db),
+    admin: models.User = Depends(require_role("admin")),
+):
+    return db.query(models.User).order_by(models.User.email).all()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserOut)
@@ -88,3 +102,27 @@ def change_password(
     db.add(current_user)
     db.commit()
     return
+
+
+@router.patch("/{user_id}", response_model=UserOut)
+def update_user(
+    user_id: int,
+    payload: UserUpdate,
+    db: Session = Depends(get_db),
+    admin: models.User = Depends(require_role("admin")),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado",
+        )
+
+    data = payload.model_dump(exclude_unset=True)
+    for field, value in data.items():
+        setattr(user, field, value)
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
