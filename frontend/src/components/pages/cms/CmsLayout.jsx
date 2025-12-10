@@ -47,6 +47,14 @@ export default function CmsLayout() {
               }>
               Media
             </Link>
+            <Link
+              to='/cms/account'
+              className={
+                'block rounded px-3 py-2 hover:bg-slate-800 ' +
+                isActive('/cms/account')
+              }>
+              Mi cuenta
+            </Link>
           </nav>
 
           <div className='mt-auto px-4 pb-4'>
