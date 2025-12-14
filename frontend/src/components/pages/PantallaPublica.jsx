@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchMediaByPlaylist } from '../../api/media';
+import CampusMap from '../CampusMap.jsx';
 
 const PLAYLIST_LED_ID = 1;
 const GROUP_SIZE = 4;
@@ -70,7 +71,7 @@ export default function PantallaPublica() {
   const currentGroup = groups[currentGroupIndex];
 
   return (
-    <div className='min-h-screen w-full flex flex-col bg-slate-50 text-slate-900'>
+    <div className='h-screen w-full flex flex-col bg-slate-50 text-slate-900'>
       {/* Header */}
       <header className='h-14 px-10 flex items-center justify-between bg-[#003A6A] text-white'>
         <div className='flex items-center gap-3'>
@@ -88,9 +89,9 @@ export default function PantallaPublica() {
       </header>
 
       {/* Contenedor central */}
-      <main className='flex-1 px-6 py-4 md:px-10 md:py-6'>
-        <div className='h-[90vh] w-auto rounded-lg bg-white shadow-sm border border-slate-200 p-3 md:p-4'>
-          <div className='h-[86vh] w-auto grid grid-cols-2 grid-rows-2 gap-3'>
+      <main className='flex-1 overflow-hidden px-6 py-4 md:px-10 md:py-6'>
+        <div className='h-[90vh] w-full grid grid-cols-[2fr_1fr] rounded-lg bg-white shadow-sm border border-slate-200 p-3 md:p-4 gap-8'>
+          <div className='h-[86vh] w-full grid grid-cols-2 grid-rows-2 gap-3'>
             {currentGroup.map(m => {
               const src = m.file_url.startsWith('http')
                 ? m.file_url
@@ -127,6 +128,10 @@ export default function PantallaPublica() {
                 </div>
               );
             })}
+          </div>
+
+          <div className='h-[86vh] w-full rounded-md overflow-hidden'>
+            <CampusMap />
           </div>
         </div>
       </main>
