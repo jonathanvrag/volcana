@@ -8,6 +8,7 @@ app = FastAPI(title="Volcana Pantalla API")
 
 origins = [
     "http://localhost:5173",  # Vite dev
+    "https://volcana.jonathanvera.dev",
 ]
 
 app.add_middleware(
