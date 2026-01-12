@@ -12,8 +12,14 @@ import PrivateRoute from './router/PrivateRoute';
 function App() {
   return (
     <Routes>
-      {/* Pantalla pública */}
-      <Route path='/' element={<PantallaPublica />} />
+      {/* Pantalla pública con 4 paneles + mapa (playlist 1) */}
+      <Route path='/' element={<PantallaPublica playlistId={1} />} />
+
+      {/* Pantalla con video único en bucle (playlist 2) */}
+      <Route
+        path='/video'
+        element={<PantallaPublica playlistId={2} soloVideo={true} />}
+      />
 
       {/* Login */}
       <Route path='/login' element={<LoginPage />} />

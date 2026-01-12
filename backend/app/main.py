@@ -13,10 +13,12 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # En producción usa dominios específicos: ["http://localhost:8080", "https://volcana.jonathanvera.dev"]
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+    expose_headers=["*"],
+    max_age=3600,  # Cache de preflight por 1 hora
 )
 
 app.include_router(media.router, prefix="/api")

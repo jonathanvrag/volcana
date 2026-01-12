@@ -4,7 +4,6 @@ import {
   fetchMedia,
   createMedia,
   deleteMedia,
-  uploadMediaFile,
   updateMedia,
 } from '../../../api/media';
 import CmsMediaForm from './CmsMediaForm';
@@ -19,6 +18,7 @@ export default function CmsMedia() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [editingId, setEditingId] = useState(null);
   const [savingId, setSavingId] = useState(null);
 
@@ -106,15 +106,79 @@ export default function CmsMedia() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setUploading(true);
+    setUploadProgress(0);
+    setError('');
+
     try {
-      setUploading(true);
-      setError('');
-      const data = await uploadMediaFile(file);
-      setFileUrl(data.file_url);
+      const token = localStorage.getItem('token');
+
+      // Usar XMLHttpRequest para trackear progreso
+      const response = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        // Evento de progreso del upload
+        xhr.upload.addEventListener('progress', e => {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded * 100) / e.total);
+            setUploadProgress(percent);
+          }
+        });
+
+        // Evento cuando termina la carga
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+              // eslint-disable-next-line no-unused-vars
+            } catch (parseError) {
+              reject(new Error('Error parseando respuesta del servidor'));
+            }
+          } else {
+            let errorMsg = `Error ${xhr.status}`;
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              errorMsg = errorData.detail || errorData.message || errorMsg;
+            } catch {
+              errorMsg = xhr.responseText || errorMsg;
+            }
+            reject(new Error(errorMsg));
+          }
+        });
+
+        // Evento de error de red
+        xhr.addEventListener('error', () => {
+          reject(new Error('Error de red al subir el archivo'));
+        });
+
+        // Evento de timeout
+        xhr.addEventListener('timeout', () => {
+          reject(new Error('Timeout: el archivo tardó demasiado en subir'));
+        });
+
+        // Configurar request
+        xhr.open('POST', `${API_ORIGIN}/api/upload`);
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+        // Timeout de 10 minutos para archivos grandes
+        xhr.timeout = 600000;
+
+        // Enviar
+        xhr.send(formData);
+      });
+
+      // Actualizar la URL del archivo
+      setFileUrl(response.file_url || response.url);
     } catch (err) {
-      setError(err.message || 'Error subiendo archivo');
+      console.error('Error subiendo archivo:', err);
+      setError(`Error subiendo archivo: ${err.message}`);
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   }
 
@@ -185,6 +249,7 @@ export default function CmsMedia() {
         setDuration={setDuration}
         creating={creating}
         uploading={uploading}
+        uploadProgress={uploadProgress}
         onCreate={handleCreate}
         onFileSelect={handleFileSelect}
         fileInputRef={fileInputRef}

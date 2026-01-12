@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react';
 import { fetchMediaByPlaylist } from '../../api/media';
 import CampusMap from '../CampusMap.jsx';
 
-const PLAYLIST_LED_ID = 1;
 const GROUP_SIZE = 4;
 const GROUP_DURATION = 20;
 
 const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || 'http://localhost:8000';
 
-export default function PantallaPublica() {
+export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
   const [groups, setGroups] = useState([]);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -19,13 +18,19 @@ export default function PantallaPublica() {
       try {
         setLoading(true);
         setError('');
-        const data = await fetchMediaByPlaylist(PLAYLIST_LED_ID);
+        const data = await fetchMediaByPlaylist(playlistId);
 
-        const g = [];
-        for (let i = 0; i < data.length; i += GROUP_SIZE) {
-          g.push(data.slice(i, i + GROUP_SIZE));
+        if (soloVideo) {
+          // Para vista de video único, no agrupamos
+          setGroups([data]);
+        } else {
+          // Vista normal: grupos de 4
+          const g = [];
+          for (let i = 0; i < data.length; i += GROUP_SIZE) {
+            g.push(data.slice(i, i + GROUP_SIZE));
+          }
+          setGroups(g);
         }
-        setGroups(g);
         setCurrentGroupIndex(0);
       } catch (err) {
         setError(err.message || 'Error cargando contenido');
@@ -34,16 +39,16 @@ export default function PantallaPublica() {
       }
     }
     load();
-  }, []);
+  }, [playlistId, soloVideo]);
 
   useEffect(() => {
-    if (groups.length === 0) return;
+    if (groups.length === 0 || soloVideo) return; // No rotar si es video único
     const timer = setTimeout(
       () => setCurrentGroupIndex(prev => (prev + 1) % groups.length),
       GROUP_DURATION * 1000
     );
     return () => clearTimeout(timer);
-  }, [groups, currentGroupIndex]);
+  }, [groups, currentGroupIndex, soloVideo]);
 
   if (loading) {
     return (
@@ -91,45 +96,90 @@ export default function PantallaPublica() {
       {/* Contenedor central */}
       <main className='flex-1 overflow-hidden px-6 py-4 md:px-10 md:py-6'>
         <div className='h-[90vh] w-full grid grid-cols-[2fr_1fr] rounded-lg bg-white shadow-sm border border-slate-200 p-3 md:p-4 gap-8'>
-          <div className='h-[86vh] w-full grid grid-cols-2 grid-rows-2 gap-3'>
-            {currentGroup.map(m => {
-              const src = m.file_url.startsWith('http')
-                ? m.file_url
-                : `${API_ORIGIN}${m.file_url}`;
+          
+          {/* Área izquierda: Grid 2x2 o Video único */}
+          {soloVideo && currentGroup.length > 0 ? (
+            // Video único ocupando toda el área izquierda
+            <div className='h-[86vh] w-full relative bg-slate-900 rounded-md overflow-hidden flex items-center justify-center'>
+              {(() => {
+                const video = currentGroup[0];
+                const src = video.file_url.startsWith('http')
+                  ? video.file_url
+                  : `${API_ORIGIN}${video.file_url}`;
 
-              return (
-                <div
-                  key={m.id}
-                  className='relative bg-slate-900 rounded-md overflow-hidden flex items-center justify-center'>
-                  {m.type === 'video' ? (
-                    <video
-                      src={src}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className='w-full h-full object-contain bg-black'
-                    />
-                  ) : (
-                    <img
-                      src={src}
-                      alt={m.title || ''}
-                      className='w-full h-full object-contain bg-black'
-                    />
-                  )}
+                return (
+                  <>
+                    {video.type === 'video' ? (
+                      <video
+                        src={src}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className='w-full h-full object-contain bg-black'
+                      />
+                    ) : (
+                      <img
+                        src={src}
+                        alt={video.title || ''}
+                        className='w-full h-full object-contain bg-black'
+                      />
+                    )}
 
-                  {m.title && (
-                    <div className='absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-1.5'>
-                      <p className='text-xs md:text-sm font-medium text-slate-50'>
-                        {m.title}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                    {video.title && (
+                      <div className='absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-1.5'>
+                        <p className='text-xs md:text-sm font-medium text-slate-50'>
+                          {video.title}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          ) : (
+            // Grid 2x2 normal (4 paneles)
+            <div className='h-[86vh] w-full grid grid-cols-2 grid-rows-2 gap-3'>
+              {currentGroup.map(m => {
+                const src = m.file_url.startsWith('http')
+                  ? m.file_url
+                  : `${API_ORIGIN}${m.file_url}`;
 
+                return (
+                  <div
+                    key={m.id}
+                    className='relative bg-slate-900 rounded-md overflow-hidden flex items-center justify-center'>
+                    {m.type === 'video' ? (
+                      <video
+                        src={src}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className='w-full h-full object-contain bg-black'
+                      />
+                    ) : (
+                      <img
+                        src={src}
+                        alt={m.title || ''}
+                        className='w-full h-full object-contain bg-black'
+                      />
+                    )}
+
+                    {m.title && (
+                      <div className='absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-1.5'>
+                        <p className='text-xs md:text-sm font-medium text-slate-50'>
+                          {m.title}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Área derecha: Mapa */}
           <div className='h-[86vh] w-full rounded-md overflow-hidden'>
             <CampusMap />
           </div>

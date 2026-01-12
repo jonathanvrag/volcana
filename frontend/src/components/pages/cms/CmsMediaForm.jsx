@@ -14,6 +14,7 @@ export default function CmsMediaForm({
   setDuration,
   creating,
   uploading,
+  uploadProgress,
   onCreate,
   onFileSelect,
   fileInputRef,
@@ -81,18 +82,30 @@ export default function CmsMediaForm({
           <button
             type='button'
             onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            className='inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded border border-slate-300 bg-white text-slate-800 hover:bg-slate-50'>
+            disabled={uploading}
+            className='inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed'>
             Seleccionar archivo
           </button>
 
+          {/* Barra de progreso */}
           {uploading && (
-            <p className='text-[11px] text-slate-500 mt-1'>
-              Subiendo archivo...
-            </p>
+            <div className='mt-2 space-y-1'>
+              <div className='flex items-center justify-between text-[11px] text-slate-600'>
+                <span>Subiendo archivo...</span>
+                <span className='font-medium'>{uploadProgress}%</span>
+              </div>
+              <div className='w-full bg-slate-200 rounded-full h-2 overflow-hidden'>
+                <div
+                  className='bg-sky-600 h-2 rounded-full transition-all duration-300 ease-out'
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
           )}
+
           {!uploading && fileUrl.startsWith('/media/') && (
             <p className='text-[11px] text-slate-500 mt-1 truncate'>
-              Archivo seleccionado: {fileUrl.replace('/media/', '')}
+              ✓ Archivo subido: {fileUrl.replace('/media/', '')}
             </p>
           )}
         </div>
@@ -141,8 +154,8 @@ export default function CmsMediaForm({
 
       <button
         type='submit'
-        disabled={creating || !playlistId || !fileUrl.trim()}
-        className='inline-flex items-center px-3 py-1.5 text-sm font-medium rounded bg-sky-700 text-white hover:bg-sky-800 disabled:opacity-60'>
+        disabled={creating || uploading || !playlistId || !fileUrl.trim()}
+        className='inline-flex items-center px-3 py-1.5 text-sm font-medium rounded bg-sky-700 text-white hover:bg-sky-800 disabled:opacity-60 disabled:cursor-not-allowed'>
         {creating ? 'Creando...' : 'Crear media'}
       </button>
     </form>
