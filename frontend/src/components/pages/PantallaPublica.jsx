@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchMediaByPlaylist } from '../../api/media';
 import CampusMap from '../CampusMap.jsx';
+import logo from '../../assets/logo_EAFIT_negro.svg';
 
 const GROUP_SIZE = 4;
 const GROUP_DURATION = 20;
@@ -75,12 +76,15 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
 
   return (
     <div className='w-screen h-screen flex flex-col bg-white overflow-hidden'>
-      {/* Header - más compacto para pantalla 1170x504 */}
+      {/* Header con logo EAFIT */}
       <header className='flex-shrink-0 h-12 px-6 flex items-center justify-between bg-[#003A6A] text-white'>
         <div className='flex items-center gap-3'>
-          <div className='text-sm font-semibold tracking-[0.15em] uppercase'>
-            Universidad EAFIT
-          </div>
+          {/* Logo EAFIT */}
+          <img
+            src={logo}
+            alt='Universidad EAFIT'
+            className='h-6 brightness-0 invert'
+          />
           <div className='h-4 w-px bg-white/30' />
           <div className='text-xs font-medium'>
             Punto de Monitoreo La Volcana
@@ -122,15 +126,6 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
                         className='w-full h-full object-cover'
                       />
                     )}
-
-                    {/* Título comentado */}
-                    {/* {video.title && (
-                      <div className='absolute bottom-0 left-0 right-0 bg-white/60 px-2 py-1'>
-                        <p className='text-[10px] font-medium text-white truncate'>
-                          {video.title}
-                        </p>
-                      </div>
-                    )} */}
                   </>
                 );
               })()}
@@ -160,15 +155,6 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
                         className='w-full h-full object-cover'
                       />
                     )}
-
-                    {/* Título comentado */}
-                    {/* {m.title && (
-                      <div className='absolute bottom-0 left-0 right-0 bg-white/60 px-2 py-1'>
-                        <p className='text-[10px] font-medium text-white truncate'>
-                          {m.title}
-                        </p>
-                      </div>
-                    )} */}
                   </div>
                 );
               })}
