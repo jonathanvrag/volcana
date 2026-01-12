@@ -21,10 +21,8 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
         const data = await fetchMediaByPlaylist(playlistId);
 
         if (soloVideo) {
-          // Para vista de video único, no agrupamos
           setGroups([data]);
         } else {
-          // Vista normal: grupos de 4
           const g = [];
           for (let i = 0; i < data.length; i += GROUP_SIZE) {
             g.push(data.slice(i, i + GROUP_SIZE));
@@ -42,7 +40,7 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
   }, [playlistId, soloVideo]);
 
   useEffect(() => {
-    if (groups.length === 0 || soloVideo) return; // No rotar si es video único
+    if (groups.length === 0 || soloVideo) return;
     const timer = setTimeout(
       () => setCurrentGroupIndex(prev => (prev + 1) % groups.length),
       GROUP_DURATION * 1000
@@ -76,31 +74,30 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
   const currentGroup = groups[currentGroupIndex];
 
   return (
-    <div className='h-screen w-full flex flex-col bg-slate-50 text-slate-900'>
-      {/* Header */}
-      <header className='h-14 px-10 flex items-center justify-between bg-[#003A6A] text-white'>
+    <div className='w-screen h-screen flex flex-col bg-white overflow-hidden'>
+      {/* Header - más compacto para pantalla 1170x504 */}
+      <header className='flex-shrink-0 h-12 px-6 flex items-center justify-between bg-[#003A6A] text-white'>
         <div className='flex items-center gap-3'>
-          <div className='text-base font-semibold tracking-[0.18em] uppercase'>
+          <div className='text-sm font-semibold tracking-[0.15em] uppercase'>
             Universidad EAFIT
           </div>
-          <div className='h-6 w-px bg-white/30' />
-          <div className='text-sm font-medium'>
+          <div className='h-4 w-px bg-white/30' />
+          <div className='text-xs font-medium'>
             Punto de Monitoreo La Volcana
           </div>
         </div>
-        <div className='text-xs tracking-[0.18em] uppercase text-sky-100'>
+        <div className='text-[10px] tracking-[0.15em] uppercase text-sky-100'>
           Ciencia · Tecnología · Innovación
         </div>
       </header>
 
-      {/* Contenedor central */}
-      <main className='flex-1 overflow-hidden px-6 py-4 md:px-10 md:py-6'>
-        <div className='h-[90vh] w-full grid grid-cols-[2fr_1fr] rounded-lg bg-white shadow-sm border border-slate-200 p-3 md:p-4 gap-8'>
-          
-          {/* Área izquierda: Grid 2x2 o Video único */}
+      {/* Contenedor principal */}
+      <main className='flex-1 flex gap-2 p-2 min-h-0 overflow-hidden'>
+        {/* Área de contenido - proporción 267:83 según especificaciones */}
+        <div className='flex-grow' style={{ flexBasis: '267fr', minWidth: 0 }}>
           {soloVideo && currentGroup.length > 0 ? (
-            // Video único ocupando toda el área izquierda
-            <div className='h-[86vh] w-full relative bg-slate-900 rounded-md overflow-hidden flex items-center justify-center'>
+            // Video único
+            <div className='w-full h-full bg-white flex items-center justify-center'>
               {(() => {
                 const video = currentGroup[0];
                 const src = video.file_url.startsWith('http')
@@ -116,39 +113,37 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
                         muted
                         loop
                         playsInline
-                        className='w-full h-full object-contain bg-black'
+                        className='w-full h-full object-cover'
                       />
                     ) : (
                       <img
                         src={src}
                         alt={video.title || ''}
-                        className='w-full h-full object-contain bg-black'
+                        className='w-full h-full object-cover'
                       />
                     )}
 
-                    {video.title && (
-                      <div className='absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-1.5'>
-                        <p className='text-xs md:text-sm font-medium text-slate-50'>
+                    {/* Título comentado */}
+                    {/* {video.title && (
+                      <div className='absolute bottom-0 left-0 right-0 bg-white/60 px-2 py-1'>
+                        <p className='text-[10px] font-medium text-white truncate'>
                           {video.title}
                         </p>
                       </div>
-                    )}
+                    )} */}
                   </>
                 );
               })()}
             </div>
           ) : (
-            // Grid 2x2 normal (4 paneles)
-            <div className='h-[86vh] w-full grid grid-cols-2 grid-rows-2 gap-3'>
+            <div className='w-full h-full grid grid-cols-2 grid-rows-2 gap-1'>
               {currentGroup.map(m => {
                 const src = m.file_url.startsWith('http')
                   ? m.file_url
                   : `${API_ORIGIN}${m.file_url}`;
 
                 return (
-                  <div
-                    key={m.id}
-                    className='relative bg-slate-900 rounded-md overflow-hidden flex items-center justify-center'>
+                  <div key={m.id} className='relative bg-white overflow-hidden'>
                     {m.type === 'video' ? (
                       <video
                         src={src}
@@ -156,33 +151,36 @@ export default function PantallaPublica({ playlistId = 1, soloVideo = false }) {
                         muted
                         loop
                         playsInline
-                        className='w-full h-full object-contain bg-black'
+                        className='w-full h-full object-cover'
                       />
                     ) : (
                       <img
                         src={src}
                         alt={m.title || ''}
-                        className='w-full h-full object-contain bg-black'
+                        className='w-full h-full object-cover'
                       />
                     )}
 
-                    {m.title && (
-                      <div className='absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-1.5'>
-                        <p className='text-xs md:text-sm font-medium text-slate-50'>
+                    {/* Título comentado */}
+                    {/* {m.title && (
+                      <div className='absolute bottom-0 left-0 right-0 bg-white/60 px-2 py-1'>
+                        <p className='text-[10px] font-medium text-white truncate'>
                           {m.title}
                         </p>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 );
               })}
             </div>
           )}
+        </div>
 
-          {/* Área derecha: Mapa */}
-          <div className='h-[86vh] w-full rounded-md overflow-hidden'>
-            <CampusMap />
-          </div>
+        {/* Canal Clima - 83cm de los 350cm totales */}
+        <div
+          className='flex-shrink-0 h-full bg-white'
+          style={{ width: '23.7%', minWidth: 0 }}>
+          <CampusMap />
         </div>
       </main>
     </div>

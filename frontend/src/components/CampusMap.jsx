@@ -47,16 +47,12 @@ export default function CampusMap() {
         center={EAFIT_CENTER}
         zoom={9}
         style={{ width: '100%', height: '100%' }}
-        dragging
-        zoomControl
-        doubleClickZoom
-        scrollWheelZoom
-        touchZoom>
+        zoomControl={false}>
         <MapAutoNavigator station={activeStation} />
 
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          attribution='© OpenStreetMap contributors'
+          attribution=''
         />
         <ScaleControl position='bottomleft' imperial={false} />
 
